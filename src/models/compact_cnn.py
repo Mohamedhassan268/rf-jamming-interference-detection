@@ -8,8 +8,8 @@ import torch
 from torch import nn
 
 
-class CompactRFNet(nn.Module):
-    """A provisional Conv1D baseline; not the recovered original network."""
+class ProvisionalCompactRFNet(nn.Module):
+    """A provisional Conv1D reconstruction baseline, not recovered original code."""
 
     def __init__(
         self,
@@ -65,3 +65,7 @@ class CompactRFNet(nn.Module):
 def count_trainable_parameters(model: nn.Module) -> int:
     """Count parameters that participate in optimization."""
     return sum(parameter.numel() for parameter in model.parameters() if parameter.requires_grad)
+
+
+# Backward-compatible import name. The class itself remains explicitly provisional.
+CompactRFNet = ProvisionalCompactRFNet

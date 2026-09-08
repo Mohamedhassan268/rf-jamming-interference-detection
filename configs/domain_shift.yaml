@@ -1,14 +1,15 @@
 extends: baseline.yaml
+# TARGET-DOMAIN PLACEHOLDER: no capture session or verified label mapping is present.
 dataset:
   source_name: radioml2018
   target_name: captured_rf
   target_path: data/captures/
-  task_type: TBD
-  classes: TBD
+  task_type: null
+  classes: null
 evaluation:
   preserve_target_test_set: true
   compute_calibration: true
-  checkpoint: TBD
-  capture_session: TBD
+  checkpoint: null
+  capture_session: null
   label_column: label
 notes: "Evaluate the untouched source-trained model before target-domain tuning."

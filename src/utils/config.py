@@ -13,6 +13,19 @@ class ConfigError(ValueError):
     """Human-readable experiment configuration error."""
 
 
+UNRESOLVED_FIELD_MESSAGES = {
+    "dataset.file": "RadioML file has not been provided. Set dataset.file to an authorized local HDF5 filename.",
+    "dataset.task_type": "Task label definition has not yet been reconstructed. Set dataset.task_type before training.",
+    "dataset.classes": "Training classes have not yet been verified. Set dataset.classes explicitly before training.",
+    "dataset.input_length": "Input window length has not yet been verified. Set dataset.input_length before training.",
+    "dataset.schema.samples_key": "RadioML sample-array key is unknown. Inspect the HDF5 file and set dataset.schema.samples_key.",
+    "dataset.schema.labels_key": "RadioML label-array key is unknown. Inspect the HDF5 file and set dataset.schema.labels_key.",
+    "dataset.schema.class_names": "Class-index semantics are unknown. Set dataset.schema.class_names from verified evidence.",
+    "model.num_classes": "Model output count is unknown because the label space is unresolved. Set model.num_classes explicitly.",
+    "evaluation.capture_session": "No captured-RF evaluation session has been selected. Set evaluation.capture_session.",
+}
+
+
 def _merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
     result = deepcopy(base)
     for key, value in override.items():
@@ -58,9 +71,10 @@ def require_resolved(config: dict[str, Any], fields: Iterable[str]) -> None:
         if value is None or (isinstance(value, str) and value.strip().upper() == "TBD"):
             unresolved.append(field)
     if unresolved:
-        raise ConfigError(
-            "Cannot continue because required experimental facts are unresolved: "
-            + ", ".join(unresolved)
-            + ". Replace each TBD only with verified project information."
-        )
-
+        details = [
+            UNRESOLVED_FIELD_MESSAGES.get(
+                field, f"Required field {field} is unresolved; provide a verified value before execution."
+            )
+            for field in unresolved
+        ]
+        raise ConfigError("Cannot continue because experimental facts are unresolved:\n- " + "\n- ".join(details))

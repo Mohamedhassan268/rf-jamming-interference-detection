@@ -1,83 +1,161 @@
 # RF Jamming & Interference Detection under Train-to-Field Domain Shift
 
-A reproducible PyTorch pipeline for reconstructing a compact RF classifier trained on RadioML 2018.01A and evaluating its behavior under shifted or captured RF conditions.
+This repository reconstructs and extends a compact RF classifier originally developed using RadioML 2018.01A, with particular attention to the degradation that occurs when a model moves from a controlled training distribution toward captured RF conditions. The original task semantics and artifacts have not yet been recovered, so the current implementation is explicitly a provisional reconstruction rather than a claimed reproduction.
 
-> The original classifier showed a substantial train-to-field performance gap when moved from its controlled training distribution to captured RF. This repository reconstructs that experiment and studies the sources of the mismatch rather than reporting only in-distribution performance.
+## Research Motivation
 
-## Status
+RF classifiers can perform well in-distribution while failing when receiver characteristics, channel conditions, gain, interference structure, noise, or acquisition settings change. This repository is designed to measure that source-to-target gap, inspect likely causes, and support controlled ablations. It does not claim to have solved domain adaptation.
 
-The repository provides configuration, strict data adapters, preprocessing, a provisional model, validation-selected training, preserved-split source evaluation, untouched captured-domain evaluation, experiment recording, and lightweight CI. No project training has been run and no numerical results are claimed. The exact task, labels, dataset subset, original architecture, and capture settings remain `TBD` pending recovery of original artifacts.
+## Current Status
 
-## Known facts
+Implemented:
 
-- The original training source was RadioML 2018.01A.
-- The original model was a compact CNN with roughly 250K parameters.
-- It was designed with a USRP-class deployment target in mind.
-- Performance degraded on captured RF due to train-to-field mismatch and architecture choices that did not generalize well.
+- Strict RadioML 2018.01A HDF5 adapter with explicit schema and shape validation
+- Internal raw-I/Q convention `[N, 2, T]`
+- Configurable preprocessing and RF augmentations, disabled by default
+- Provisional Conv1D reconstruction baseline
+- Seeded train/validation/test splitting and validation-loss model selection
+- Source-domain metrics, per-SNR metrics, calibration, and confusion matrices
+- Labeled captured-RF adapter and untouched-model target evaluation path
+- Append-only experiment records and lightweight dataset-free tests
 
-The `CompactRFNet` included here is a new, configurable provisional baseline, not a claim about the recovered original architecture.
+Pending:
 
-## Repository layout
+- Recovery of the exact prediction task and label-construction procedure
+- Validation against the actual RadioML file and original project artifacts
+- Recovery of the original architecture, preprocessing, and split protocol
+- Reproducible source and captured-domain experiments
+- Publication of actual metrics and figures
+
+No RF training run has been completed in this repository.
+
+For the current default architecture, the trainable-parameter count is `240,192 + 385 × C`, where `C` is the verified number of output classes. Because `C` is unresolved, reporting one exact project model size would be misleading.
+
+## Pipeline
+
+The implemented code expects raw I/Q windows. The semantic output classes remain unresolved.
 
 ```text
-configs/       YAML experiment definitions
-data/          local dataset locations and data policy
-docs/          reconstruction notes and research protocol
-experiments/   append-only experiment index
-figures/       generated figures (no fabricated outputs)
-scripts/       preparation, training, evaluation, and analysis CLIs
-src/           reusable data, model, evaluation, and utility modules
-tests/         lightweight tests that require no RF dataset
+Raw I/Q [N, 2, T]
+        ↓
+Configurable preprocessing
+        ↓
+Provisional compact CNN
+        ↓
+Configured RF class / interference label (definition: TBD)
+        ↓
+Held-out source-domain evaluation
+        ↓
+Untouched shifted-domain evaluation
+        ↓
+Descriptive failure analysis
 ```
 
-## Setup
+## Provenance
 
-Python 3.10 or newer is required.
+Recovered facts from prior project material:
+
+- RadioML 2018.01A was used.
+- A compact CNN was used, targeting approximately 250K parameters.
+- USRP-class SDR deployment was an intended target.
+- Performance degraded outside the controlled training distribution/on captured RF.
+- Train-to-field mismatch and architecture choices were identified as contributing issues.
+
+Reconstruction choices—not recovered historical facts—include the current Conv1D layout, `[N, 2, T]` interface, seed `42`, 70/15/15 split, Adam defaults, batch size, and disabled-by-default preprocessing. See [docs/original_experiment.md](docs/original_experiment.md).
+
+## Reproducibility
+
+From the repository root, these lightweight commands are dataset-free and tested:
 
 ```bash
-python -m venv .venv
 python -m pip install -e ".[dev]"
-pytest
+python -m pytest
+python scripts/summarize_model.py
+python -c "from src.utils.config import load_config; print(load_config('configs/baseline.yaml')['seed'])"
 ```
 
-Obtain RadioML 2018.01A through an authorized source and place it under `data/raw/`; raw data is deliberately ignored by Git. See `data/README.md`.
+On Windows, the same repository checks plus every CLI help command can be run together in a visible terminal:
 
-## Expected workflow
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/verify_repository.ps1
+```
+
+Every CLI exposes its current interface through `--help`:
 
 ```bash
-python scripts/prepare_radioml.py --config configs/baseline.yaml
-python scripts/train.py --config configs/baseline.yaml
-python scripts/evaluate.py --config configs/baseline.yaml --checkpoint runs/.../best_model.pt
-python scripts/evaluate_shift.py --config configs/domain_shift.yaml --checkpoint runs/.../best_model.pt
-python scripts/analyze_domain_shift.py --source source.npy --target target.npy
+python scripts/prepare_radioml.py --help
+python scripts/prepare_captures.py --help
+python scripts/train.py --help
+python scripts/evaluate.py --help
+python scripts/evaluate_shift.py --help
+python scripts/analyze_domain_shift.py --help
 ```
 
-Commands validate required settings and fail with readable `TBD` errors. Training writes its exact split and dataset-index fingerprint into each checkpoint; evaluation refuses to proceed if the selected dataset has changed.
+Training is intentionally blocked until the required task, class, schema, and input-length fields in `configs/baseline.yaml` are replaced with verified facts. The program reports each unresolved field rather than selecting labels silently. RadioML schema inspection can run before those facts are known when an authorized HDF5 path is supplied:
 
-## Dataset policy
+```bash
+python scripts/prepare_radioml.py --config configs/baseline.yaml --input PATH_TO_RADIOML_HDF5
+```
 
-RadioML and captured RF are not committed. Dataset licensing and permission to publish captures must be established independently of the MIT code license. Capture metadata must record only known facts; unknown values remain `null` or `TBD`.
+This last command is a usage template because the dataset path is machine-specific and no RadioML file is present in the repository.
 
-## Unresolved details
+## Results
 
-- Exact task and label construction
-- Modulation classes, SNR range, input length, and source split
-- Original preprocessing and CNN architecture
-- Training protocol and all source/target metrics
-- Capture hardware, signal settings, labels, and publication rights
-- Corrective changes and corrected architecture/results
+> Numerical results will be added after reconstruction of the original experiment and reproducible reruns. No placeholder accuracy values are reported.
 
-See `docs/original_experiment.md` for the complete boundary between known facts and reconstruction choices.
-Use `docs/recovery_checklist.md` to record artifact-backed answers before enabling training.
+`experiments/results.csv` currently contains only its schema. There are no project accuracy, F1, calibration, training-history, or train-to-field gap measurements to report.
+
+## Domain Shift
+
+The implemented evaluation path can compare a preserved RadioML test split with a labeled capture session using the same trained checkpoint, class order, input shape, and preprocessing. It records accuracy, macro/weighted F1, ECE, per-SNR metrics when available, and confusion matrices. Descriptive I/Q distribution plots are also supported.
+
+This is planned experimental capability, not a completed domain-shift result. No capture data is currently present, and no adaptation method has been evaluated.
 
 ## Limitations
 
-This repository currently supplies infrastructure, not reproduced evidence. It does not claim real-time inference, USRP deployment, real-world data availability, successful domain adaptation, or measured accuracy. The RadioML adapter supports documented HDF5-style arrays but must inspect actual files before accepting them; incompatible shapes are rejected rather than reshaped silently.
+- The exact original task and label construction remain unknown.
+- It is not known whether RadioML labels were used directly or transformed into a genuine interference task.
+- The RadioML subset, SNR range, input length, and original split are unresolved.
+- The current CNN is technically reasonable but provisional; it is not recovered original code.
+- RadioML is not redistributed or automatically downloaded.
+- Real captured RF and its acquisition metadata have not been recovered.
+- Live USRP inference and real-time latency have not been demonstrated.
+- Sample-level source splitting is implemented; parent-waveform grouping requires metadata not currently available.
+- The GitHub Actions workflow is prepared locally but is not published because the current GitHub token lacks workflow-write scope.
+
+## Repository Structure
+
+```text
+.
+├── configs/                 experiment and domain-shift configuration
+├── data/                    data policy, ignored raw/processed locations, capture schema
+├── docs/                    provenance, dataset, domain-shift, and experiment documentation
+├── experiments/             append-only results index
+├── figures/                 ignored generated figures
+├── scripts/                 preparation, training, evaluation, analysis, model summary
+├── src/
+│   ├── data/                RadioML/capture adapters, transforms, splits
+│   ├── evaluation/          metrics, per-SNR analysis, calibration
+│   ├── models/              provisional compact CNN
+│   ├── training/            validation-selected training loop
+│   └── utils/               config, reproducibility, experiment metadata
+└── tests/                   dataset-free unit and smoke tests
+```
 
 ## Roadmap
 
-1. Recover the original task, artifacts, and acquisition metadata.
-2. Validate the loader against an authorized RadioML 2018.01A copy.
-3. reproduce a held-out source-domain baseline.
-4. Measure the untouched model on a separately held target domain.
-5. Run controlled preprocessing, augmentation, and architecture ablations.
+- [x] Create strict data-adapter and configuration infrastructure
+- [x] Implement provisional compact-CNN and preprocessing modules
+- [x] Add validation-selected training and preserved-split evaluation
+- [x] Add metrics, calibration, capture loading, and experiment tracking
+- [x] Add dataset-free automated tests
+- [ ] Recover the original task and label-construction procedure
+- [ ] Inspect and validate the actual RadioML 2018.01A file
+- [ ] Recover or document differences from the original architecture
+- [ ] Run and report a held-out source-domain baseline
+- [ ] Recover and validate captured RF plus acquisition metadata
+- [ ] Measure the untouched source-to-target performance gap
+- [ ] Run controlled preprocessing, augmentation, and architecture ablations
+- [ ] Publish CI after GitHub workflow-write access is available
+
+Code is released under the MIT License. Dataset licensing and capture-publication rights must be established separately.

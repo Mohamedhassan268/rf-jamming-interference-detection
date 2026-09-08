@@ -1,20 +1,27 @@
 seed: 42
 deterministic: false
 
+# PROVISIONAL RECONSTRUCTION CONFIGURATION
+# Numeric defaults below are new implementation choices, not recovered settings.
+# Required unknowns remain null and are rejected by the CLI before execution.
+provenance:
+  historical_fidelity: false
+  status: provisional_reconstruction
+
 dataset:
   name: radioml2018
   path: data/raw/
-  file: TBD
+  file: null
   schema:
-    samples_key: TBD
-    labels_key: TBD
-    snr_key: TBD
-    class_names: TBD
-  task_type: TBD
-  classes: TBD
-  snr_min: TBD
-  snr_max: TBD
-  input_length: TBD
+    samples_key: null
+    labels_key: null
+    snr_key: null
+    class_names: null
+  task_type: null
+  classes: null
+  snr_min: null
+  snr_max: null
+  input_length: null
   max_examples_per_class: null
   sample_seed: 42
   train_fraction: 0.70
@@ -32,15 +39,15 @@ preprocessing:
     enabled: false
   awgn:
     enabled: false
-    snr_db_min: TBD
-    snr_db_max: TBD
+    snr_db_min: null
+    snr_db_max: null
   frequency_offset:
     enabled: false
-    max_normalized_offset: TBD
+    max_normalized_offset: null
 
 model:
-  name: compact_cnn
-  num_classes: TBD
+  name: provisional_compact_cnn
+  num_classes: null
   conv_channels: [64, 128, 256]
   kernel_sizes: [7, 5, 3]
   pooling: [2, 2, 2]

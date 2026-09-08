@@ -1,6 +1,5 @@
 """RF model definitions."""
 
-from .compact_cnn import CompactRFNet, count_trainable_parameters
+from .compact_cnn import CompactRFNet, ProvisionalCompactRFNet, count_trainable_parameters
 
-__all__ = ["CompactRFNet", "count_trainable_parameters"]
-
+__all__ = ["CompactRFNet", "ProvisionalCompactRFNet", "count_trainable_parameters"]

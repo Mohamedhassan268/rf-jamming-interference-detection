@@ -29,4 +29,3 @@ def test_confidence_and_ece_are_bounded():
     ece = expected_calibration_error(logits, truth, n_bins=4)
     assert np.all((confidence >= 0) & (confidence <= 1))
     assert 0 <= ece <= 1
-

@@ -1,7 +1,6 @@
-# Corrected architecture and successful interventions have not been recovered.
+# NON-EXECUTABLE PLACEHOLDER: corrected architecture and interventions are unknown.
 extends: baseline.yaml
-status: TBD
+status: null
 model:
-  name: TBD
+  name: null
 notes: "Do not populate until corrective changes are supported by original artifacts or controlled experiments."
-

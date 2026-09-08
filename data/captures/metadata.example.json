@@ -1,12 +1,11 @@
 {
-  "receiver": "TBD",
+  "receiver": null,
   "sample_rate_hz": null,
   "center_frequency_hz": null,
   "bandwidth_hz": null,
   "gain_db": null,
-  "antenna": "TBD",
-  "location": "TBD",
-  "capture_date": "TBD",
-  "notes": "TBD"
+  "antenna": null,
+  "location": null,
+  "capture_date": null,
+  "notes": null
 }
-

@@ -19,6 +19,9 @@ dependencies = [
   "h5py>=3.8",
 ]
 
+[project.urls]
+Repository = "https://github.com/Mohamedhassan268/rf-jamming-interference-detection"
+
 [project.optional-dependencies]
 dev = ["pytest>=7.4"]
 
@@ -28,4 +31,3 @@ include = ["src*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
-
