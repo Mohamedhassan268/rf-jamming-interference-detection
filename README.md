@@ -1,6 +1,6 @@
 # RF Jamming & Interference Detection under Train-to-Field Domain Shift
 
-This repository reconstructs and extends a compact RF classifier originally developed using RadioML 2018.01A, with particular attention to the degradation that occurs when a model moves from a controlled training distribution toward captured RF conditions. The original task semantics and artifacts have not yet been recovered, so the current implementation is explicitly a provisional reconstruction rather than a claimed reproduction.
+This repository defines a reproducible binary RF experiment using RadioML 2018.01A source windows: distinguish an unchanged source window (`clean`) from a window containing a controlled synthetic jammer (`jammed`). The study is motivated by earlier compact-CNN work whose artifacts could not be recovered, with particular attention to degradation when a model moves from controlled synthetic training data toward captured RF conditions.
 
 ## Research Motivation
 
@@ -12,16 +12,17 @@ Implemented:
 
 - Strict RadioML 2018.01A HDF5 adapter with explicit schema and shape validation
 - Internal raw-I/Q convention `[N, 2, T]`
+- Explicit binary label generation after source-window splitting
+- Deterministic tone, chirp, and barrage-noise injection with recorded JSR
 - Configurable preprocessing and RF augmentations, disabled by default
 - Provisional Conv1D reconstruction baseline
 - Seeded train/validation/test splitting and validation-loss model selection
-- Source-domain metrics, per-SNR metrics, calibration, and confusion matrices
+- Source-domain metrics, per-SNR and per-jammer/JSR detection rates, calibration, and confusion matrices
 - Labeled captured-RF adapter and untouched-model target evaluation path
 - Append-only experiment records and lightweight dataset-free tests
 
 Pending:
 
-- Recovery of the exact prediction task and label-construction procedure
 - Validation against the actual RadioML file and original project artifacts
 - Recovery of the original architecture, preprocessing, and split protocol
 - Reproducible source and captured-domain experiments
@@ -29,11 +30,11 @@ Pending:
 
 No RF training run has been completed in this repository.
 
-For the current default architecture, the trainable-parameter count is `240,192 + 385 × C`, where `C` is the verified number of output classes. Because `C` is unresolved, reporting one exact project model size would be misleading.
+For the current two-class default architecture, the trainable-parameter count is exactly `240,962` (`240,192 + 385 × C` with `C=2`). This is the count for the new provisional model, not evidence for the historical approximately-250K model.
 
 ## Pipeline
 
-The implemented code expects raw I/Q windows. The semantic output classes remain unresolved.
+The implemented code expects raw I/Q windows and predicts the newly defined binary labels `clean=0` and `jammed=1`.
 
 ```text
 Raw I/Q [N, 2, T]
@@ -42,7 +43,7 @@ Configurable preprocessing
         ↓
 Provisional compact CNN
         ↓
-Configured RF class / interference label (definition: TBD)
+Binary clean / synthetically jammed prediction
         ↓
 Held-out source-domain evaluation
         ↓
@@ -61,7 +62,7 @@ Recovered facts from prior project material:
 - Performance degraded outside the controlled training distribution/on captured RF.
 - Train-to-field mismatch and architecture choices were identified as contributing issues.
 
-Reconstruction choices—not recovered historical facts—include the current Conv1D layout, `[N, 2, T]` interface, seed `42`, 70/15/15 split, Adam defaults, batch size, and disabled-by-default preprocessing. See [docs/original_experiment.md](docs/original_experiment.md).
+The new binary task, synthetic jammer families, JSR grid, Conv1D layout, `[N, 2, T]` interface, seed `42`, 70/15/15 split, Adam defaults, and disabled-by-default preprocessing are new experimental choices—not recovered historical facts. See [docs/task_definition.md](docs/task_definition.md) and [docs/original_experiment.md](docs/original_experiment.md).
 
 ## Reproducibility
 
@@ -91,7 +92,7 @@ python scripts/evaluate_shift.py --help
 python scripts/analyze_domain_shift.py --help
 ```
 
-Training is intentionally blocked until the required task, class, schema, and input-length fields in `configs/baseline.yaml` are replaced with verified facts. The program reports each unresolved field rather than selecting labels silently. RadioML schema inspection can run before those facts are known when an authorized HDF5 path is supplied:
+Training is intentionally blocked until an authorized RadioML file is supplied and its sample/label keys and input length are verified. The new clean/jammed labels are explicit; the loader does not guess the source file schema. RadioML inspection can run first:
 
 ```bash
 python scripts/prepare_radioml.py --config configs/baseline.yaml --input PATH_TO_RADIOML_HDF5
@@ -101,20 +102,20 @@ This last command is a usage template because the dataset path is machine-specif
 
 ## Results
 
-> Numerical results will be added after reconstruction of the original experiment and reproducible reruns. No placeholder accuracy values are reported.
+> Numerical results will be added after the new experiment is run reproducibly. No placeholder accuracy values are reported.
 
 `experiments/results.csv` currently contains only its schema. There are no project accuracy, F1, calibration, training-history, or train-to-field gap measurements to report.
 
 ## Domain Shift
 
-The implemented evaluation path can compare a preserved RadioML test split with a labeled capture session using the same trained checkpoint, class order, input shape, and preprocessing. It records accuracy, macro/weighted F1, ECE, per-SNR metrics when available, and confusion matrices. Descriptive I/Q distribution plots are also supported.
+The implemented evaluation path can compare held-out synthetically labeled RadioML windows with a compatible labeled capture session using the same trained checkpoint, class order, input shape, and preprocessing. It records accuracy, macro/weighted F1, ECE, per-SNR metrics when available, and confusion matrices. Descriptive I/Q distribution plots are also supported.
 
 This is planned experimental capability, not a completed domain-shift result. No capture data is currently present, and no adaptation method has been evaluated.
 
 ## Limitations
 
-- The exact original task and label construction remain unknown.
-- It is not known whether RadioML labels were used directly or transformed into a genuine interference task.
+- The exact historical task and label construction remain unknown; the current binary task is new.
+- Training jammers are simplified synthetic tone, chirp, and barrage models, not captured field interference.
 - The RadioML subset, SNR range, input length, and original split are unresolved.
 - The current CNN is technically reasonable but provisional; it is not recovered original code.
 - RadioML is not redistributed or automatically downloaded.
@@ -149,7 +150,7 @@ This is planned experimental capability, not a completed domain-shift result. No
 - [x] Add validation-selected training and preserved-split evaluation
 - [x] Add metrics, calibration, capture loading, and experiment tracking
 - [x] Add dataset-free automated tests
-- [ ] Recover the original task and label-construction procedure
+- [x] Define a new binary task and leakage-safe synthetic label-generation protocol
 - [ ] Inspect and validate the actual RadioML 2018.01A file
 - [ ] Recover or document differences from the original architecture
 - [ ] Run and report a held-out source-domain baseline

@@ -16,8 +16,14 @@ import torch
 from sklearn.metrics import ConfusionMatrixDisplay
 from torch.utils.data import DataLoader
 
+from src.data.jamming import PairedBinaryJammingDataset
 from src.data.pipeline import TransformedSubset, build_radioml_dataset, collate_iq
-from src.evaluation import classification_metrics, expected_calibration_error, metrics_per_snr
+from src.evaluation import (
+    binary_jamming_metrics,
+    classification_metrics,
+    expected_calibration_error,
+    metrics_per_snr,
+)
 from src.models import CompactRFNet
 from src.utils.config import ConfigError, load_config
 from src.utils.logging import append_result, git_commit, utc_timestamp
@@ -72,8 +78,13 @@ def main() -> None:
         test_indices = np.asarray(checkpoint["splits"]["test"], dtype=np.int64)
         if len(test_indices) == 0 or test_indices.max() >= len(dataset):
             raise ConfigError("Checkpoint test indices are empty or incompatible with the dataset.")
+        generated_test = PairedBinaryJammingDataset(dataset, test_indices, config["label_generation"])
         test_data = TransformedSubset(
-            dataset, test_indices, config.get("preprocessing", {}), augment=False, seed=int(config["seed"])
+            generated_test,
+            np.arange(len(generated_test)),
+            config.get("preprocessing", {}),
+            augment=False,
+            seed=int(config["seed"]),
         )
         loader = DataLoader(
             test_data,
@@ -89,12 +100,13 @@ def main() -> None:
         model = _model(config).to(device)
         model.load_state_dict(checkpoint["model_state_dict"])
         model.eval()
-        logits_parts, truth_parts, snrs = [], [], []
+        logits_parts, truth_parts, snrs, example_metadata = [], [], [], []
         with torch.no_grad():
             for samples, labels, metadata in loader:
                 logits_parts.append(model(samples.to(device=device, dtype=torch.float32)).cpu().numpy())
                 truth_parts.append(labels.numpy())
                 snrs.extend(item.get("snr_db") for item in metadata)
+                example_metadata.extend(metadata)
         logits = np.concatenate(logits_parts)
         truth = np.concatenate(truth_parts)
         predicted = logits.argmax(axis=1)
@@ -104,6 +116,7 @@ def main() -> None:
         )
         metrics["ece"] = expected_calibration_error(logits, truth)
         metrics["per_snr"] = metrics_per_snr(truth, predicted, snrs) if any(value is not None for value in snrs) else None
+        metrics["jamming"] = binary_jamming_metrics(truth, predicted, example_metadata)
         output_path = checkpoint_path.parent / "source_test_metrics.json"
         with output_path.open("w", encoding="utf-8") as handle:
             json.dump(metrics, handle, indent=2)

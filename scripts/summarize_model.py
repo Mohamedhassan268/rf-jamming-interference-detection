@@ -29,7 +29,11 @@ def _build(config: dict, num_classes: int) -> ProvisionalCompactRFNet:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default="configs/baseline.yaml")
-    parser.add_argument("--num-classes", type=int, help="Verified output-class count for an exact total")
+    parser.add_argument(
+        "--num-classes",
+        type=int,
+        help="Override the configured output-class count for an exact total",
+    )
     args = parser.parse_args()
     try:
         config = load_config(args.config)
@@ -44,13 +48,17 @@ def main() -> None:
         print(f"Pooling: {config['model']['pooling']}")
         print(f"Classifier size: {config['model']['classifier_size']}")
         print(f"Trainable-parameter formula: {fixed:,} + {per_class:,} * num_classes")
-        if args.num_classes is None:
+        configured_classes = config["model"].get("num_classes")
+        selected_classes = args.num_classes if args.num_classes is not None else configured_classes
+        if selected_classes is None:
             print("Exact total: unresolved until the verified label count is supplied")
         else:
-            if args.num_classes < 2:
+            selected_classes = int(selected_classes)
+            if selected_classes < 2:
                 raise ConfigError("--num-classes must be at least 2.")
-            exact = count_trainable_parameters(_build(config, args.num_classes))
-            print(f"Exact total for num_classes={args.num_classes}: {exact:,}")
+            exact = count_trainable_parameters(_build(config, selected_classes))
+            source = "CLI override" if args.num_classes is not None else "configuration"
+            print(f"Exact total for num_classes={selected_classes} ({source}): {exact:,}")
     except (ConfigError, KeyError, TypeError, ValueError) as error:
         parser.error(str(error))
 

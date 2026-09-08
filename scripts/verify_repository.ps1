@@ -36,7 +36,7 @@ try {
     Invoke-RepositoryCheck "Shifted evaluation CLI" { python scripts/evaluate_shift.py --help }
     Invoke-RepositoryCheck "Domain analysis CLI" { python scripts/analyze_domain_shift.py --help }
     Write-Host ""
-    Write-Host "=== Intentional unresolved-task gate ===" -ForegroundColor Cyan
+    Write-Host "=== Intentional unverified-input gate ===" -ForegroundColor Cyan
     $previousErrorPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     $gateOutput = python scripts/train.py --config configs/baseline.yaml 2>&1 | Out-String
@@ -44,10 +44,10 @@ try {
     $ErrorActionPreference = $previousErrorPreference
     Write-Host $gateOutput
     if ($gateExitCode -eq 0) {
-        throw "Training unexpectedly ran with unresolved task configuration"
+        throw "Training unexpectedly ran with unverified input configuration"
     }
-    if ($gateOutput -notmatch "Task label definition has not yet been reconstructed") {
-        throw "Training failed without the expected task-definition explanation"
+    if ($gateOutput -notmatch "Input window length has not yet been verified") {
+        throw "Training failed without the expected input-verification explanation"
     }
     "PASS" | Set-Content -LiteralPath $statusPath
     Write-Host ""

@@ -6,3 +6,4 @@ The internal convention is `[N, 2, T]`. This is a reconstruction interface, not 
 
 Captured or shifted RF uses session directories described in `data/README.md`. Unknown acquisition fields remain unknown. Adjacent windows from a common waveform or session should be split as a group to prevent leakage.
 
+For the new binary task, source RadioML indices are split before label generation. Each source window produces one unchanged `clean` example and one deterministic synthetic `jammed` example within the same split. See `docs/task_definition.md`. RadioML modulation labels are retained as metadata/stratification information; they are not the model target.

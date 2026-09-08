@@ -17,13 +17,13 @@ Artifact search update: likely local project, document, desktop, download, and O
 | Item | Current state | Supported fact / new assumption | Action needed |
 | ---- | ------------- | ------------------------------- | ------------- |
 | README | Rewritten to separate implemented code, recovered facts, pending work, and tested commands | Mixed: RadioML/domain-gap story is recovered; pipeline details are reconstruction | Add real results only after verified reruns |
-| Task definition | Broad RF jamming/interference objective documented; exact target unknown | Recovered broad objective; exact labels unsupported | Highest priority: recover what the model predicted |
+| Task definition | New binary `clean` vs synthetically `jammed` task is explicit | New experiment; historical target remains unknown | Validate the design on the actual RadioML file |
 | Dataset loader | Strict HDF5 adapter; validates `[N,2,T]` or `[N,T,2]`, filters classes/SNR, preserves metadata | Entire adapter interface is a reconstruction choice | Validate against the actual authorized RadioML file |
-| Label construction | Not implemented or inferred | Unknown | Recover label-generation code/procedure before training |
-| Preprocessing | None/RMS normalization, DC removal, amplitude, phase, AWGN, and frequency-offset operations | New reconstruction infrastructure; none is claimed original | Run one-factor-at-a-time ablations after baseline recovery |
-| Model architecture | `ProvisionalCompactRFNet`, configurable Conv1D; `240,192 + 385 × C` trainable parameters | Compact CNN/~250K target recovered; exact layers are new | Resolve class count, then compare with original code |
+| Label construction | Paired clean/jammed generation after source-window splitting | New experiment design | Report results by jammer family and JSR |
+| Preprocessing | None/RMS normalization, DC removal, amplitude, phase, AWGN, and frequency-offset operations | New reconstruction infrastructure; none is claimed original | Run one-factor-at-a-time ablations after the first source baseline |
+| Model architecture | `ProvisionalCompactRFNet`, configurable Conv1D; `240,962` trainable parameters for two classes | Compact CNN/~250K target recovered; exact layers and current count are new | Compare with original code if it is later recovered |
 | Training script | Config-driven Adam training, validation-loss selection, early stopping, saved metadata/splits | Training protocol is new | Do not call it historical baseline until protocol is recovered |
-| Evaluation script | Fingerprint-checked held-out source evaluation with standard metrics and calibration | New evaluation implementation | Run only after verified task/data configuration |
+| Evaluation script | Fingerprint-checked held-out source evaluation with standard metrics, calibration, false-alarm rate, and jammer/JSR-stratified detection rates | New evaluation implementation | Run only after verified task/data configuration |
 | Domain-shift script | Untouched checkpoint evaluation for exact-mapped capture labels | Original degradation is recovered; current implementation is new | Recover captures and verify source/target label equivalence |
 | Configs | Unknown executable fields are `null`; defaults marked provisional; explicit validation | Numeric defaults are new assumptions | Replace nulls only with evidenced values |
 | Tests | Dataset-free tests cover transforms, loaders, shapes, metrics, config, and training loop | Synthetic software verification, not RF evidence | Add integration tests against metadata-only fixtures as needed |
@@ -38,13 +38,12 @@ Artifact search update: likely local project, document, desktop, download, and O
 
 **NOT YET**
 
-The codebase is inspectable and honest, but its central scientific object is unresolved. Exact blockers:
+The codebase now defines a coherent scientific task, but it lacks dataset validation and experimental evidence. Exact blockers:
 
-1. No verified task or label-construction definition.
-2. No actual RadioML file has been inspected through the adapter.
-3. No historically faithful architecture or documented difference analysis.
-4. No reproducible held-out source-domain result.
-5. No recovered, labeled capture data or measured train-to-field gap.
-6. No actual result figures.
+1. No actual RadioML file has been inspected through the adapter.
+2. No reproducible held-out synthetic source-domain result.
+3. No recovered, labeled capture data or measured train-to-field gap.
+4. No actual result figures.
+5. Historical fidelity remains unavailable; the repository must continue presenting this as a new experiment.
 
 Publishing the link on a CV now would present competent infrastructure, but not yet a completed RF research project.

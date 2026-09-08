@@ -2,7 +2,7 @@
 
 Every run should save the resolved YAML configuration, seed, UTC timestamp, Git commit when available, model architecture and parameter count, training history, checkpoint, and machine-readable metrics. The shared CSV is append-only.
 
-Start with E0, the historically faithful baseline once recoverable. Then change one factor at a time: RMS normalization, DC removal, phase rotation, frequency offset, amplitude scaling, AWGN, combined augmentation, recovered architecture correction, and architecture plus the best validated augmentation. Do not label the provisional network E0 until historical fidelity is established.
+Start with E0, the new binary synthetic-jamming baseline defined in `docs/task_definition.md`. It is not historically faithful. Then change one factor at a time: RMS normalization, DC removal, phase rotation, frequency offset, amplitude scaling, AWGN, combined augmentation, architecture changes, and architecture plus the best validated augmentation.
 
 Never use training accuracy as the result, repeatedly tune on a final test set, or fill missing measurements with estimates. Report negative findings and class imbalance.
 

@@ -6,7 +6,7 @@ deterministic: false
 # Required unknowns remain null and are rejected by the CLI before execution.
 provenance:
   historical_fidelity: false
-  status: provisional_reconstruction
+  status: new_experiment_design
 
 dataset:
   name: radioml2018
@@ -17,8 +17,8 @@ dataset:
     labels_key: null
     snr_key: null
     class_names: null
-  task_type: null
-  classes: null
+  task_type: binary_synthetic_jamming_detection
+  classes: all
   snr_min: null
   snr_max: null
   input_length: null
@@ -47,12 +47,31 @@ preprocessing:
 
 model:
   name: provisional_compact_cnn
-  num_classes: null
+  num_classes: 2
   conv_channels: [64, 128, 256]
   kernel_sizes: [7, 5, 3]
   pooling: [2, 2, 2]
   dropout: 0.3
   classifier_size: 384
+
+label_generation:
+  strategy: paired_clean_jammed
+  labels:
+    clean: 0
+    jammed: 1
+  # New experimental design choices; not recovered historical settings.
+  jammer_types: [tone, chirp, barrage]
+  jsr_db_values: [-10.0, -5.0, 0.0, 5.0, 10.0]
+  seed: 42
+  tone:
+    normalized_frequency_min: -0.45
+    normalized_frequency_max: 0.45
+    excluded_dc_half_width: 0.02
+  chirp:
+    normalized_start_min: -0.40
+    normalized_start_max: 0.40
+    normalized_sweep_min: 0.05
+    normalized_sweep_max: 0.40
 
 training:
   epochs: 50

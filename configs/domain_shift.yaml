@@ -4,8 +4,6 @@ dataset:
   source_name: radioml2018
   target_name: captured_rf
   target_path: data/captures/
-  task_type: null
-  classes: null
 evaluation:
   preserve_target_test_set: true
   compute_calibration: true

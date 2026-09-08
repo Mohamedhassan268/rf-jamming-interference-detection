@@ -15,6 +15,7 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
+from src.data.jamming import PairedBinaryJammingDataset
 from src.data.pipeline import TransformedSubset, build_radioml_dataset, collate_iq
 from src.data.splitting import make_splits
 from src.models import CompactRFNet, count_trainable_parameters
@@ -53,11 +54,10 @@ def main() -> None:
         seed_everything(seed, bool(config.get("deterministic", False)))
         dataset = build_radioml_dataset(config)
         model_config = config["model"]
-        if int(model_config["num_classes"]) != len(dataset.selected_class_ids):
-            raise ConfigError(
-                f"model.num_classes={model_config['num_classes']} but filters selected "
-                f"{len(dataset.selected_class_ids)} classes: {dataset.selected_class_names}."
-            )
+        if config.get("label_generation", {}).get("labels") != {"clean": 0, "jammed": 1}:
+            raise ConfigError("The new binary task requires label_generation.labels clean=0 and jammed=1.")
+        if int(model_config["num_classes"]) != 2:
+            raise ConfigError("The binary clean/jammed task requires model.num_classes=2.")
         splits = make_splits(
             dataset.selected_labels,
             float(config["dataset"]["train_fraction"]),
@@ -66,8 +66,20 @@ def main() -> None:
             seed,
         )
         preprocessing = config.get("preprocessing", {})
-        train_data = TransformedSubset(dataset, splits.train, preprocessing, augment=True, seed=seed)
-        validation_data = TransformedSubset(dataset, splits.validation, preprocessing, augment=False, seed=seed)
+        generated_train = PairedBinaryJammingDataset(dataset, splits.train, config["label_generation"])
+        generated_validation = PairedBinaryJammingDataset(
+            dataset, splits.validation, config["label_generation"]
+        )
+        train_data = TransformedSubset(
+            generated_train, np.arange(len(generated_train)), preprocessing, augment=True, seed=seed
+        )
+        validation_data = TransformedSubset(
+            generated_validation,
+            np.arange(len(generated_validation)),
+            preprocessing,
+            augment=False,
+            seed=seed,
+        )
         generator = torch.Generator().manual_seed(seed)
         batch_size = int(config["training"]["batch_size"])
         workers = int(config["training"].get("num_workers", 0))
@@ -104,7 +116,7 @@ def main() -> None:
         np.savez_compressed(run_dir / "splits.npz", **split_payload)
         common_checkpoint = {
             "config": config,
-            "class_names": dataset.selected_class_names,
+            "class_names": ["clean", "jammed"],
             "selected_source_indices_sha256": _index_fingerprint(dataset.indices),
             "splits": {name: values.tolist() for name, values in split_payload.items()},
             "parameter_count": parameter_count,
@@ -131,9 +143,11 @@ def main() -> None:
                 "seed": seed,
                 "model": model.__class__.__name__,
                 "parameter_count": parameter_count,
-                "class_names": dataset.selected_class_names,
-                "dataset_selected_samples": len(dataset),
-                "split_counts": {name: len(values) for name, values in split_payload.items()},
+                "class_names": ["clean", "jammed"],
+                "dataset_selected_source_windows": len(dataset),
+                "generated_training_examples": len(generated_train),
+                "generated_validation_examples": len(generated_validation),
+                "split_source_window_counts": {name: len(values) for name, values in split_payload.items()},
             },
         )
         print(f"Training complete. Artifacts saved to {run_dir}. The test split was not evaluated.")

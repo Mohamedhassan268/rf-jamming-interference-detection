@@ -39,7 +39,7 @@ The following are new implementation choices made while building this repository
 - Current capture-session directory format and exact-label matching
 - HDF5 adapter interface and dataset-index fingerprinting
 
-The current `ProvisionalCompactRFNet` is a technically reasonable reconstruction baseline. It is not recovered original code. With the present defaults its trainable-parameter count is `240,192 + 385 × C`, where `C` is the output-class count; `C` remains unresolved.
+The current `ProvisionalCompactRFNet` is a technically reasonable reconstruction baseline. It is not recovered original code. With the new binary task and present defaults, its trainable-parameter count is exactly `240,962` (`240,192 + 385 × C` with `C=2`).
 
 ## Unresolved Original Task
 
@@ -52,7 +52,9 @@ The current `ProvisionalCompactRFNet` is a technically reasonable reconstruction
 - Whether RadioML modulation labels were used directly as a proxy: TBD
 - Whether signals were mixed or synthetic jammer waveforms were injected: TBD
 
-Until these are resolved, the repository must not claim that its executable model performs a verified jamming-detection task.
+Until these are resolved, the repository must not claim that the new executable task reproduces the historical jamming-detection target.
+
+The repository now defines a separate, new binary synthetic-jamming task in `docs/task_definition.md`. That definition permits new experiments to proceed but does not resolve or replace the unknown historical facts in this document.
 
 ## Unresolved Dataset Details
 

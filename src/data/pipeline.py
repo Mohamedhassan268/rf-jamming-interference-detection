@@ -44,11 +44,19 @@ def build_radioml_dataset(config: dict[str, Any]) -> RadioML2018Dataset:
             "dataset.input_length",
             "dataset.schema.samples_key",
             "dataset.schema.labels_key",
-            "dataset.schema.class_names",
         ],
     )
     dataset_config = config["dataset"]
     schema_config = dataset_config["schema"]
+    configured_classes = dataset_config["classes"]
+    classes = None if isinstance(configured_classes, str) and configured_classes.lower() == "all" else configured_classes
+    class_names = schema_config.get("class_names")
+    if _is_unresolved(class_names):
+        class_names = None
+    if classes is not None and any(isinstance(value, str) for value in classes) and class_names is None:
+        raise ConfigError(
+            "String modulation filtering requires a verified dataset.schema.class_names mapping."
+        )
     snr_key = schema_config.get("snr_key")
     if _is_unresolved(snr_key):
         snr_key = None
@@ -57,8 +65,8 @@ def build_radioml_dataset(config: dict[str, Any]) -> RadioML2018Dataset:
     dataset = RadioML2018Dataset(
         resolve_dataset_path(config),
         RadioMLSchema(schema_config["samples_key"], schema_config["labels_key"], snr_key),
-        classes=dataset_config["classes"],
-        class_names=schema_config["class_names"],
+        classes=classes,
+        class_names=class_names,
         snr_min=None if _is_unresolved(snr_min) else float(snr_min),
         snr_max=None if _is_unresolved(snr_max) else float(snr_max),
         max_examples_per_class=dataset_config.get("max_examples_per_class"),

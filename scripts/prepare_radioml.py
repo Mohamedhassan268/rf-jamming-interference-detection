@@ -60,7 +60,6 @@ def main() -> None:
                 "dataset.input_length",
                 "dataset.schema.samples_key",
                 "dataset.schema.labels_key",
-                "dataset.schema.class_names",
             ],
         )
         dataset_config = config["dataset"]
@@ -77,8 +76,8 @@ def main() -> None:
                 labels_key=schema_config["labels_key"],
                 snr_key=snr_key,
             ),
-            classes=dataset_config["classes"],
-            class_names=schema_config["class_names"],
+            classes=None if str(dataset_config["classes"]).lower() == "all" else dataset_config["classes"],
+            class_names=None if _is_tbd(schema_config.get("class_names")) else schema_config["class_names"],
             snr_min=snr_min,
             snr_max=snr_max,
             max_examples_per_class=dataset_config.get("max_examples_per_class"),
