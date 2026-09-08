@@ -46,6 +46,18 @@ def test_subsampling_is_reproducible(tmp_path):
     np.testing.assert_array_equal(first.indices, second.indices)
 
 
+def test_dataset_reuses_and_can_close_hdf5_handle(tmp_path):
+    path = tmp_path / "radio.h5"
+    _write_fixture(path)
+    dataset = RadioML2018Dataset(path, RadioMLSchema("X", "Y", "Z"))
+    dataset[0]
+    first_handle = dataset._handle
+    dataset[1]
+    assert dataset._handle is first_handle
+    dataset.close()
+    assert dataset._handle is None
+
+
 def test_snr_filter_requires_metadata_key(tmp_path):
     path = tmp_path / "radio.h5"
     _write_fixture(path)

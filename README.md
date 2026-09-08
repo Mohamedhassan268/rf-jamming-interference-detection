@@ -23,7 +23,7 @@ Implemented:
 
 Pending:
 
-- Validation against the actual RadioML file and original project artifacts
+- Recovery of the original project artifacts
 - Recovery of the original architecture, preprocessing, and split protocol
 - Reproducible source and captured-domain experiments
 - Publication of actual metrics and figures
@@ -92,13 +92,19 @@ python scripts/evaluate_shift.py --help
 python scripts/analyze_domain_shift.py --help
 ```
 
-Training is intentionally blocked until an authorized RadioML file is supplied and its sample/label keys and input length are verified. The new clean/jammed labels are explicit; the loader does not guess the source file schema. RadioML inspection can run first:
+The default configuration uses a deterministic compact subset: 9,216 source windows, all 24 modulation classes, 64 windows per selected modulation/SNR condition, and SNR levels `[-20, -10, 0, 10, 20, 30]` dB. The ignored local HDF5 is 61.11 MiB. Recreate it without downloading the 21 GB source file:
 
-```bash
-python scripts/prepare_radioml.py --config configs/baseline.yaml --input PATH_TO_RADIOML_HDF5
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/download_small_radioml.ps1
 ```
 
-This last command is a usage template because the dataset path is machine-specific and no RadioML file is present in the repository.
+The downloader uses HTTP byte ranges, writes temporary and final data only under `data/` on D: when the repository is on D:, rejects full-file responses, and enforces a 150 MiB transfer ceiling. Validate the configured schema with:
+
+```bash
+python scripts/prepare_radioml.py --config configs/baseline.yaml --validate-configured-schema
+```
+
+The dataset itself is excluded from Git. Its local provenance JSON records source and output hashes, selection parameters, shapes, and license.
 
 ## Results
 
@@ -116,7 +122,7 @@ This is planned experimental capability, not a completed domain-shift result. No
 
 - The exact historical task and label construction remain unknown; the current binary task is new.
 - Training jammers are simplified synthetic tone, chirp, and barrage models, not captured field interference.
-- The RadioML subset, SNR range, input length, and original split are unresolved.
+- The new compact subset is verified, but it represents only six of the full dataset's SNR levels and 64 contiguous source windows per selected modulation/SNR condition.
 - The current CNN is technically reasonable but provisional; it is not recovered original code.
 - RadioML is not redistributed or automatically downloaded.
 - Real captured RF and its acquisition metadata have not been recovered.

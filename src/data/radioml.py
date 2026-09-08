@@ -61,6 +61,7 @@ class RadioML2018Dataset(Dataset):
     ) -> None:
         self.path = Path(path)
         self.schema = schema
+        self._handle: h5py.File | None = None
         if not self.path.is_file():
             raise FileNotFoundError(f"RadioML file not found: {self.path}")
         with h5py.File(self.path, "r") as handle:
@@ -122,10 +123,27 @@ class RadioML2018Dataset(Dataset):
     def __len__(self) -> int:
         return len(self.indices)
 
+    def _file(self) -> h5py.File:
+        if self._handle is None or not self._handle.id.valid:
+            self._handle = h5py.File(self.path, "r")
+        return self._handle
+
+    def close(self) -> None:
+        if self._handle is not None:
+            self._handle.close()
+            self._handle = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        state = self.__dict__.copy()
+        state["_handle"] = None
+        return state
+
+    def __del__(self) -> None:
+        self.close()
+
     def __getitem__(self, index: int) -> tuple[torch.Tensor, int, dict[str, Any]]:
         source_index = int(self.indices[index])
-        with h5py.File(self.path, "r") as handle:
-            sample = np.asarray(handle[self.schema.samples_key][source_index])
+        sample = np.asarray(self._file()[self.schema.samples_key][source_index])
         if self.layout == "NT2":
             sample = sample.T
         if sample.ndim != 2 or sample.shape[0] != 2:
@@ -153,4 +171,3 @@ class RadioML2018Dataset(Dataset):
         if self.class_names is None:
             return [str(value) for value in self.selected_class_ids]
         return [self.class_names[int(value)] for value in self.selected_class_ids]
-

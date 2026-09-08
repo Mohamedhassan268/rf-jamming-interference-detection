@@ -38,6 +38,16 @@ def _index_fingerprint(indices: np.ndarray) -> str:
     return hashlib.sha256(np.asarray(indices, dtype=np.int64).tobytes()).hexdigest()
 
 
+def _split_strata(dataset) -> np.ndarray:
+    """Stratify by source modulation and SNR when SNR metadata are available."""
+    modulation_ids = dataset.selected_labels
+    if dataset.snrs is None:
+        return modulation_ids
+    selected_snrs = np.asarray(dataset.snrs[dataset.indices])
+    _, snr_ids = np.unique(selected_snrs, return_inverse=True)
+    return modulation_ids * (snr_ids.max() + 1) + snr_ids
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True)
@@ -59,7 +69,7 @@ def main() -> None:
         if int(model_config["num_classes"]) != 2:
             raise ConfigError("The binary clean/jammed task requires model.num_classes=2.")
         splits = make_splits(
-            dataset.selected_labels,
+            _split_strata(dataset),
             float(config["dataset"]["train_fraction"]),
             float(config["dataset"]["validation_fraction"]),
             float(config["dataset"]["test_fraction"]),

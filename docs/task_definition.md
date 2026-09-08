@@ -17,7 +17,7 @@ Here, `clean` means **not synthetically jammed by this repository**. It does not
 
 ## Leakage Control
 
-Source RadioML windows are divided into train, validation, and test indices before labels are generated. Each selected source window then produces exactly two examples inside one split:
+Source RadioML windows are divided into train, validation, and test indices before labels are generated. When SNR metadata are present, splitting is stratified jointly by source modulation and SNR. Each selected source window then produces exactly two examples inside one split:
 
 1. an unchanged clean example;
 2. a deterministically generated jammed example.

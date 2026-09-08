@@ -22,6 +22,7 @@ data/raw/*
 data/processed/*
 data/captures/session_*/samples.npy
 data/captures/session_*/labels.csv
+data/tmp/
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 runs/

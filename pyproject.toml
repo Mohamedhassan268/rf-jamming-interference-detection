@@ -17,6 +17,7 @@ dependencies = [
   "matplotlib>=3.7",
   "torch>=2.0",
   "h5py>=3.8",
+  "requests>=2.31",
 ]
 
 [project.urls]

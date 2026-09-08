@@ -17,8 +17,8 @@ Artifact search update: likely local project, document, desktop, download, and O
 | Item | Current state | Supported fact / new assumption | Action needed |
 | ---- | ------------- | ------------------------------- | ------------- |
 | README | Rewritten to separate implemented code, recovered facts, pending work, and tested commands | Mixed: RadioML/domain-gap story is recovered; pipeline details are reconstruction | Add real results only after verified reruns |
-| Task definition | New binary `clean` vs synthetically `jammed` task is explicit | New experiment; historical target remains unknown | Validate the design on the actual RadioML file |
-| Dataset loader | Strict HDF5 adapter; validates `[N,2,T]` or `[N,T,2]`, filters classes/SNR, preserves metadata | Entire adapter interface is a reconstruction choice | Validate against the actual authorized RadioML file |
+| Task definition | New binary `clean` vs synthetically `jammed` task is explicit | New experiment; historical target remains unknown | Run and analyze the first controlled baseline |
+| Dataset loader | Strict HDF5 adapter validated on a 9,216-window range-extracted subset with X/Y/Z metadata | Adapter and subset selection are new choices | Retain the compact-subset limitation in every result |
 | Label construction | Paired clean/jammed generation after source-window splitting | New experiment design | Report results by jammer family and JSR |
 | Preprocessing | None/RMS normalization, DC removal, amplitude, phase, AWGN, and frequency-offset operations | New reconstruction infrastructure; none is claimed original | Run one-factor-at-a-time ablations after the first source baseline |
 | Model architecture | `ProvisionalCompactRFNet`, configurable Conv1D; `240,962` trainable parameters for two classes | Compact CNN/~250K target recovered; exact layers and current count are new | Compare with original code if it is later recovered |
@@ -40,10 +40,9 @@ Artifact search update: likely local project, document, desktop, download, and O
 
 The codebase now defines a coherent scientific task, but it lacks dataset validation and experimental evidence. Exact blockers:
 
-1. No actual RadioML file has been inspected through the adapter.
-2. No reproducible held-out synthetic source-domain result.
-3. No recovered, labeled capture data or measured train-to-field gap.
-4. No actual result figures.
-5. Historical fidelity remains unavailable; the repository must continue presenting this as a new experiment.
+1. No reproducible held-out synthetic source-domain result.
+2. No recovered, labeled capture data or measured train-to-field gap.
+3. No actual result figures.
+4. Historical fidelity remains unavailable; the repository must continue presenting this as a new experiment.
 
 Publishing the link on a CV now would present competent infrastructure, but not yet a completed RF research project.

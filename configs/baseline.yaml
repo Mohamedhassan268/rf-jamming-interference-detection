@@ -11,22 +11,29 @@ provenance:
 dataset:
   name: radioml2018
   path: data/raw/
-  file: null
+  file: radioml2018.01a_small.hdf5
   schema:
-    samples_key: null
-    labels_key: null
-    snr_key: null
-    class_names: null
+    samples_key: X
+    labels_key: Y
+    snr_key: Z
+    class_names: [32PSK, 16APSK, 32QAM, FM, GMSK, 32APSK, OQPSK, 8ASK, BPSK, 8PSK, AM-SSB-SC, 4ASK, 16PSK, 64APSK, 128QAM, 128APSK, AM-DSB-SC, AM-SSB-WC, 64QAM, QPSK, 256QAM, AM-DSB-WC, OOK, 16QAM]
   task_type: binary_synthetic_jamming_detection
   classes: all
-  snr_min: null
-  snr_max: null
-  input_length: null
+  snr_min: -20
+  snr_max: 30
+  input_length: 1024
   max_examples_per_class: null
   sample_seed: 42
   train_fraction: 0.70
   validation_fraction: 0.15
   test_fraction: 0.15
+  subset:
+    status: deterministic_range_extracted_subset
+    source_full_file_sha256: e3dd0bef66a3426959ee66a1709a8c0a95d4f8395d18aaf6f1214bdbc763bd38
+    local_file_sha256: 40f5245781f4f983ab5c46a382e6010453160bfc5523f16829998e8a7ff0b0eb
+    selected_snrs_db: [-20, -10, 0, 10, 20, 30]
+    samples_per_modulation_snr: 64
+    source_windows: 9216
 
 preprocessing:
   normalization: none

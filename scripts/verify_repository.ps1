@@ -1,11 +1,15 @@
 $ErrorActionPreference = "Stop"
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $runDirectory = Join-Path $repositoryRoot "runs"
+$taskTemp = Join-Path $repositoryRoot "data/tmp"
 $logPath = Join-Path $runDirectory "lightweight-checks.log"
 $statusPath = Join-Path $runDirectory "lightweight-checks.status"
 
 New-Item -ItemType Directory -Path $runDirectory -Force | Out-Null
+New-Item -ItemType Directory -Path $taskTemp -Force | Out-Null
 Remove-Item -LiteralPath $statusPath -Force -ErrorAction SilentlyContinue
+$env:TEMP = $taskTemp
+$env:TMP = $taskTemp
 Set-Location -LiteralPath $repositoryRoot
 Start-Transcript -Path $logPath -Force | Out-Null
 
@@ -24,7 +28,7 @@ function Invoke-RepositoryCheck {
 }
 
 try {
-    Invoke-RepositoryCheck "Editable installation" { python -m pip install -e ".[dev]" }
+    Invoke-RepositoryCheck "Editable installation" { python -m pip install --no-cache-dir -e ".[dev]" }
     Invoke-RepositoryCheck "Unit tests" { python -m pytest }
     Invoke-RepositoryCheck "Package imports" { python -c "import src; import src.data; import src.models; import src.training; import src.evaluation; import src.utils; print(src.__version__)" }
     Invoke-RepositoryCheck "Configuration loading" { python -c "from src.utils.config import load_config; c = load_config('configs/baseline.yaml'); print(c['provenance']); print(c['dataset']['task_type'])" }
@@ -35,19 +39,15 @@ try {
     Invoke-RepositoryCheck "Source evaluation CLI" { python scripts/evaluate.py --help }
     Invoke-RepositoryCheck "Shifted evaluation CLI" { python scripts/evaluate_shift.py --help }
     Invoke-RepositoryCheck "Domain analysis CLI" { python scripts/analyze_domain_shift.py --help }
-    Write-Host ""
-    Write-Host "=== Intentional unverified-input gate ===" -ForegroundColor Cyan
-    $previousErrorPreference = $ErrorActionPreference
-    $ErrorActionPreference = "Continue"
-    $gateOutput = python scripts/train.py --config configs/baseline.yaml 2>&1 | Out-String
-    $gateExitCode = $LASTEXITCODE
-    $ErrorActionPreference = $previousErrorPreference
-    Write-Host $gateOutput
-    if ($gateExitCode -eq 0) {
-        throw "Training unexpectedly ran with unverified input configuration"
+    Invoke-RepositoryCheck "Small-subset downloader CLI" { python scripts/download_radioml_subset.py --help }
+    $datasetPath = Join-Path $repositoryRoot "data/raw/radioml2018.01a_small.hdf5"
+    if (Test-Path -LiteralPath $datasetPath) {
+        Invoke-RepositoryCheck "Configured RadioML schema" {
+            python scripts/prepare_radioml.py --config configs/baseline.yaml --validate-configured-schema
+        }
     }
-    if ($gateOutput -notmatch "Input window length has not yet been verified") {
-        throw "Training failed without the expected input-verification explanation"
+    else {
+        Write-Host "Configured RadioML schema check skipped: local ignored dataset is absent." -ForegroundColor Yellow
     }
     "PASS" | Set-Content -LiteralPath $statusPath
     Write-Host ""
