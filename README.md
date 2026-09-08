@@ -28,7 +28,7 @@ Pending:
 - Reproducible source and captured-domain experiments
 - Publication of actual metrics and figures
 
-No RF training run has been completed in this repository.
+A two-epoch, CPU-only pipeline smoke run has completed successfully on 768 source windows. It validated training, checkpointing, held-out evaluation, metrics, and figure generation, but it is explicitly non-reportable and is not treated as an RF research result. A full baseline has not yet been run.
 
 For the current two-class default architecture, the trainable-parameter count is exactly `240,962` (`240,192 + 385 × C` with `C=2`). This is the count for the new provisional model, not evidence for the historical approximately-250K model.
 
