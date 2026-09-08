@@ -1,0 +1,35 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.idea/
+.vscode/
+.DS_Store
+
+# Local reconstruction source document
+RF_Jamming_Interference_Detection_Implementation_Plan.md
+
+# Kept locally until GitHub authentication has workflow-write scope
+.github/workflows/
+
+# RF datasets, captures, caches, and model artifacts
+data/raw/*
+data/processed/*
+data/captures/session_*/samples.npy
+data/captures/session_*/labels.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+runs/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+
+# Generated figures; keep the directory itself
+figures/*
+!figures/.gitkeep

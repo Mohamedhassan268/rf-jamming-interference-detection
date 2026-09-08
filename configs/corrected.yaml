@@ -1,0 +1,7 @@
+# Corrected architecture and successful interventions have not been recovered.
+extends: baseline.yaml
+status: TBD
+model:
+  name: TBD
+notes: "Do not populate until corrective changes are supported by original artifacts or controlled experiments."
+

@@ -1,0 +1,2 @@
+experiment_id,date,git_commit,seed,model,parameter_count,dataset,task_type,train_classes,test_domain,normalization,augmentation,learning_rate,batch_size,best_epoch,accuracy,macro_f1,weighted_f1,ece,notes
+

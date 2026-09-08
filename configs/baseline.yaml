@@ -1,0 +1,58 @@
+seed: 42
+deterministic: false
+
+dataset:
+  name: radioml2018
+  path: data/raw/
+  file: TBD
+  schema:
+    samples_key: TBD
+    labels_key: TBD
+    snr_key: TBD
+    class_names: TBD
+  task_type: TBD
+  classes: TBD
+  snr_min: TBD
+  snr_max: TBD
+  input_length: TBD
+  max_examples_per_class: null
+  sample_seed: 42
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  test_fraction: 0.15
+
+preprocessing:
+  normalization: none
+  remove_dc: false
+  amplitude_scale:
+    enabled: false
+    min: 0.8
+    max: 1.2
+  phase_rotation:
+    enabled: false
+  awgn:
+    enabled: false
+    snr_db_min: TBD
+    snr_db_max: TBD
+  frequency_offset:
+    enabled: false
+    max_normalized_offset: TBD
+
+model:
+  name: compact_cnn
+  num_classes: TBD
+  conv_channels: [64, 128, 256]
+  kernel_sizes: [7, 5, 3]
+  pooling: [2, 2, 2]
+  dropout: 0.3
+  classifier_size: 384
+
+training:
+  epochs: 50
+  batch_size: 128
+  num_workers: 0
+  optimizer: adam
+  learning_rate: 0.001
+  weight_decay: 0.0
+  early_stopping_patience: 8
+  device: auto
