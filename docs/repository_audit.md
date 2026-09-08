@@ -2,6 +2,8 @@
 
 Audit date: 2026-09-08
 
+Artifact search update: likely local project, document, desktop, download, and OneDrive locations plus all repositories accessible through the authenticated GitHub account were searched. No matching original code, RadioML file, notebook, checkpoint, capture, log, metric, or figure was recovered. A separate rule-based USRP-2920 scanner was inspected and excluded as unrelated evidence.
+
 ## Five Largest Weaknesses Before This Audit
 
 1. The exact task and label construction were unknown, so genuine jamming detection could not be distinguished from a modulation-label proxy.

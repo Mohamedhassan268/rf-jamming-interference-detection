@@ -1,6 +1,8 @@
 # Original Experiment Reconstruction
 
-This document is the provenance boundary for the repository. On 2026-09-08, the inspected workspace contained no original Python code, notebooks, model weights, RF captures, training logs, metrics, confusion matrices, or figures. Statements below are therefore limited to the supplied prior-project material.
+This document is the provenance boundary for the repository. On 2026-09-08, the repository, likely local project/document/download locations, and all repositories accessible through the authenticated GitHub account were searched for matching artifacts. No original RadioML project code, notebooks, model weights, RF captures, training logs, metrics, confusion matrices, or figures were found. Statements below are therefore limited to the supplied prior-project material and a local project-summary index.
+
+A separate rule-based USRP-2920 spectrum-monitoring/dashboard project was found. It does not use the RadioML CNN and provides no evidence that its receiver model, frequencies, gain, sample rate, thresholds, or measurements belonged to the original classifier experiment. None of those values are imported here.
 
 ## Recovered Facts
 
@@ -14,6 +16,8 @@ The following facts are supported by the prior-project material:
 - Performance degraded outside the original controlled distribution/on captured RF.
 - Train-to-field domain mismatch and architecture choices were identified as contributing issues.
 - The project was iterated after those issues were diagnosed.
+
+A local project-summary index independently repeats the approximately 250K RadioML CNN and domain-mismatch claims, but adds no task, label, architecture, or result details.
 
 These facts do not establish the exact task, labels, architecture, hardware, acquisition settings, or numerical results.
 

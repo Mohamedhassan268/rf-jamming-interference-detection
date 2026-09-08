@@ -6,15 +6,20 @@ This worksheet is intentionally factual. Enter `unknown` when a fact cannot be r
 
 | Artifact | Location | Present? | Notes |
 |---|---|---:|---|
-| Original Python scripts | TBD | TBD | |
-| Original notebooks | TBD | TBD | |
-| Model checkpoints | TBD | TBD | |
-| Training logs/history | TBD | TBD | |
-| Metrics/confusion matrices | TBD | TBD | |
-| RadioML source file | TBD | TBD | Do not commit it |
-| Captured/shifted RF | TBD | TBD | |
-| Capture labels | TBD | TBD | |
-| Corrected-model artifacts | TBD | TBD | |
+| Original Python scripts | Not found in searched local/GitHub locations | No | Search completed 2026-09-08 |
+| Original notebooks | Not found in searched local/GitHub locations | No | Unrelated FPGA/medical notebooks were excluded |
+| Model checkpoints | Not found in searched local/GitHub locations | No | Unrelated vision checkpoints were excluded |
+| Training logs/history | Not found in searched local/GitHub locations | No | |
+| Metrics/confusion matrices | Not found in searched local/GitHub locations | No | |
+| RadioML source file | Not found in searched local locations | No | Do not commit it if later recovered |
+| Captured/shifted RF | Not found in searched local locations | No | |
+| Capture labels | Not found in searched local locations | No | |
+| Corrected-model artifacts | Not found in searched local/GitHub locations | No | |
+| Project summary/index | External local project index | Yes | Repeats only the high-level RadioML/~250K/domain-mismatch claim |
+
+### Excluded candidate
+
+A separate USRP-2920 spectrum scanner/dashboard was inspected. It is rule-based, does not use the RadioML CNN, and is not treated as evidence for this experiment. Its hardware and acquisition settings must not be copied into this repository.
 
 ## Task and labels
 
@@ -73,4 +78,3 @@ This worksheet is intentionally factual. Enter `unknown` when a fact cannot be r
 ## Evidence rule
 
 A recollection may be documented as a recollection, but it must not be presented as file-verified. New reconstruction choices belong in configuration and experiment notes, not in the recovered-facts column.
-
