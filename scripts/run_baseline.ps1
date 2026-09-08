@@ -10,6 +10,7 @@ New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
 Remove-Item -LiteralPath $statusPath -Force -ErrorAction SilentlyContinue
 $env:TEMP = $taskTemp
 $env:TMP = $taskTemp
+$env:PYTHONUNBUFFERED = "1"
 Set-Location -LiteralPath $repositoryRoot
 Start-Transcript -Path $logPath -Force | Out-Null
 

@@ -94,7 +94,8 @@ def train_model(
         )
         print(
             f"epoch={epoch} train_loss={train_loss:.6f} train_accuracy={train_accuracy:.4f} "
-            f"validation_loss={validation_loss:.6f} validation_accuracy={validation_accuracy:.4f}"
+            f"validation_loss={validation_loss:.6f} validation_accuracy={validation_accuracy:.4f}",
+            flush=True,
         )
         if validation_loss < best_loss:
             best_loss = validation_loss
@@ -113,4 +114,3 @@ def train_model(
         best_epoch=best_epoch,
         history=history,
     )
-
