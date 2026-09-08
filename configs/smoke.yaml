@@ -1,0 +1,18 @@
+extends: baseline.yaml
+
+provenance:
+  status: pipeline_smoke_only
+
+dataset:
+  # Small deterministic sample for end-to-end software validation only.
+  max_examples_per_class: 32
+  schema:
+    snr_key: null
+  snr_min: null
+  snr_max: null
+
+training:
+  epochs: 2
+  batch_size: 128
+  early_stopping_patience: 2
+  device: cpu

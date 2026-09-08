@@ -106,6 +106,12 @@ python scripts/prepare_radioml.py --config configs/baseline.yaml --validate-conf
 
 The dataset itself is excluded from Git. Its local provenance JSON records source and output hashes, selection parameters, shapes, and license.
 
+On CPU-only systems, validate the complete train/checkpoint/evaluate path with a deliberately non-reportable two-epoch smoke run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_smoke.ps1
+```
+
 ## Results
 
 > Numerical results will be added after the new experiment is run reproducibly. No placeholder accuracy values are reported.
