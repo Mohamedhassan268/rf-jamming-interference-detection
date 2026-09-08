@@ -13,6 +13,23 @@ from torch.utils.data import Dataset
 SUPPORTED_JAMMERS = ("tone", "chirp", "barrage")
 
 
+def _condition_grid(config: dict[str, Any]) -> tuple[tuple[str, float], ...]:
+    jammer_types = tuple(config.get("jammer_types", ()))
+    if not jammer_types or set(jammer_types) - set(SUPPORTED_JAMMERS):
+        raise ValueError(f"jammer_types must be a non-empty subset of {SUPPORTED_JAMMERS}.")
+    jsr_values = np.asarray(config.get("jsr_db_values", ()), dtype=np.float64)
+    if not len(jsr_values) or not np.isfinite(jsr_values).all():
+        raise ValueError("jsr_db_values must contain finite values.")
+    return tuple((jammer, float(jsr)) for jammer in jammer_types for jsr in jsr_values)
+
+
+def _jammer_rng(seed: int, source_position: int, condition_index: int) -> np.random.Generator:
+    """Create a stable waveform RNG independent of iteration and worker order."""
+    return np.random.default_rng(
+        np.random.SeedSequence([seed, source_position, condition_index, 0x4A5352])
+    )
+
+
 def _validate_window(sample: np.ndarray) -> np.ndarray:
     array = np.asarray(sample)
     if array.ndim != 2 or array.shape[0] != 2:
@@ -143,19 +160,28 @@ class PairedBinaryJammingDataset(Dataset):
             raise ValueError("label_generation.strategy must be 'paired_clean_jammed'.")
         if config.get("labels") != {"clean": 0, "jammed": 1}:
             raise ValueError("Binary label mapping must be exactly clean=0 and jammed=1.")
-        self.jammer_types = tuple(config.get("jammer_types", ()))
-        if not self.jammer_types or set(self.jammer_types) - set(SUPPORTED_JAMMERS):
-            raise ValueError(f"jammer_types must be a non-empty subset of {SUPPORTED_JAMMERS}.")
-        self.jsr_values = np.asarray(config.get("jsr_db_values", ()), dtype=np.float64)
-        if not len(self.jsr_values) or not np.isfinite(self.jsr_values).all():
-            raise ValueError("jsr_db_values must contain finite values.")
         self.seed = int(config["seed"])
+        self.conditions = _condition_grid(config)
+        # Shuffle source positions once, then cycle through the condition grid.
+        # Every condition count therefore differs from every other by at most one.
+        order = np.random.default_rng(self.seed).permutation(len(self.source_indices))
+        assigned = np.empty(len(self.source_indices), dtype=np.int64)
+        assigned[order] = np.arange(len(order), dtype=np.int64) % len(self.conditions)
+        self.assigned_condition_indices = assigned
+
+    def condition_counts(self) -> dict[str, int]:
+        counts = np.bincount(self.assigned_condition_indices, minlength=len(self.conditions))
+        return {
+            f"{jammer}|{jsr:g}": int(counts[index])
+            for index, (jammer, jsr) in enumerate(self.conditions)
+        }
 
     def __len__(self) -> int:
         return 2 * len(self.source_indices)
 
     def __getitem__(self, index: int) -> tuple[torch.Tensor, int, dict[str, Any]]:
-        source_position = int(self.source_indices[index // 2])
+        source_offset = index // 2
+        source_position = int(self.source_indices[source_offset])
         sample, _source_label, source_metadata = self.source_dataset[source_position]
         array = sample.numpy()
         is_jammed = bool(index % 2)
@@ -171,9 +197,9 @@ class PairedBinaryJammingDataset(Dataset):
         }
         if not is_jammed:
             return sample.clone(), 0, metadata
-        rng = np.random.default_rng(np.random.SeedSequence([self.seed, source_position]))
-        jammer_type = self.jammer_types[int(rng.integers(len(self.jammer_types)))]
-        jsr_db = float(self.jsr_values[int(rng.integers(len(self.jsr_values)))])
+        condition_index = int(self.assigned_condition_indices[source_offset])
+        jammer_type, jsr_db = self.conditions[condition_index]
+        rng = _jammer_rng(self.seed, source_position, condition_index)
         jammer, parameters = generate_jammer(jammer_type, array.shape[-1], array.dtype, rng, self.config)
         mixed, achieved_jsr = inject_jammer(array, jammer, jsr_db)
         metadata.update(
@@ -184,4 +210,44 @@ class PairedBinaryJammingDataset(Dataset):
                 "jammer_parameters": parameters,
             }
         )
+        return torch.from_numpy(np.ascontiguousarray(mixed)), 1, metadata
+
+
+class FullJammerStressDataset(Dataset):
+    """Return all configured jammer/JSR variants for source windows in one split."""
+
+    def __init__(
+        self,
+        source_dataset: Dataset,
+        source_indices: Sequence[int],
+        config: dict[str, Any],
+    ) -> None:
+        self.source_dataset = source_dataset
+        self.source_indices = np.asarray(source_indices, dtype=np.int64)
+        self.config = config
+        self.seed = int(config["seed"])
+        self.conditions = _condition_grid(config)
+
+    def __len__(self) -> int:
+        return len(self.source_indices) * len(self.conditions)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int, dict[str, Any]]:
+        source_offset, condition_index = divmod(index, len(self.conditions))
+        source_position = int(self.source_indices[source_offset])
+        sample, _source_label, source_metadata = self.source_dataset[source_position]
+        array = sample.numpy()
+        jammer_type, jsr_db = self.conditions[condition_index]
+        rng = _jammer_rng(self.seed, source_position, condition_index)
+        jammer, parameters = generate_jammer(jammer_type, array.shape[-1], array.dtype, rng, self.config)
+        mixed, achieved_jsr = inject_jammer(array, jammer, jsr_db)
+        metadata = {
+            **source_metadata,
+            "binary_label_name": "jammed",
+            "is_jammed": True,
+            "label_generation_seed": self.seed,
+            "jammer_type": jammer_type,
+            "jsr_db_requested": jsr_db,
+            "jsr_db_achieved": achieved_jsr,
+            "jammer_parameters": parameters,
+        }
         return torch.from_numpy(np.ascontiguousarray(mixed)), 1, metadata

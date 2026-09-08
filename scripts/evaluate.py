@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import torch
 from sklearn.metrics import ConfusionMatrixDisplay
 from torch.utils.data import DataLoader
@@ -24,7 +25,7 @@ from src.evaluation import (
     expected_calibration_error,
     metrics_per_snr,
 )
-from src.models import CompactRFNet
+from src.models import CompactRFNet, count_trainable_parameters
 from src.utils.config import ConfigError, load_config
 from src.utils.logging import append_result, git_commit, utc_timestamp
 
@@ -98,6 +99,8 @@ def main() -> None:
         if device.type == "cuda" and not torch.cuda.is_available():
             raise ConfigError("CUDA was requested but is not available.")
         model = _model(config).to(device)
+        if count_trainable_parameters(model) != checkpoint["parameter_count"] or checkpoint["parameter_count"] != 240_962:
+            raise ConfigError("Checkpoint/model parameter count is not the required 240,962.")
         model.load_state_dict(checkpoint["model_state_dict"])
         model.eval()
         logits_parts, truth_parts, snrs, example_metadata = [], [], [], []
@@ -110,6 +113,8 @@ def main() -> None:
         logits = np.concatenate(logits_parts)
         truth = np.concatenate(truth_parts)
         predicted = logits.argmax(axis=1)
+        shifted = logits - logits.max(axis=1, keepdims=True)
+        probabilities = np.exp(shifted) / np.exp(shifted).sum(axis=1, keepdims=True)
         class_names = checkpoint["class_names"]
         metrics = classification_metrics(
             truth, predicted, labels=np.arange(len(class_names)), class_names=class_names
@@ -117,13 +122,39 @@ def main() -> None:
         metrics["ece"] = expected_calibration_error(logits, truth)
         metrics["per_snr"] = metrics_per_snr(truth, predicted, snrs) if any(value is not None for value in snrs) else None
         metrics["jamming"] = binary_jamming_metrics(truth, predicted, example_metadata)
-        output_path = checkpoint_path.parent / "source_test_metrics.json"
+        metrics["jammed_precision"] = metrics["per_class"]["jammed"]["precision"]
+        metrics["jammed_recall_detection_rate"] = metrics["per_class"]["jammed"]["recall"]
+        metrics["jammed_f1"] = metrics["per_class"]["jammed"]["f1"]
+        metrics["specificity"] = metrics["per_class"]["clean"]["recall"]
+        metrics["clean_false_positive_rate"] = metrics["jamming"]["clean_false_positive_rate"]["rate"]
+        output_path = checkpoint_path.parent / "metrics.json"
+        existing = {}
+        if output_path.is_file():
+            with output_path.open("r", encoding="utf-8") as handle:
+                existing = json.load(handle)
         with output_path.open("w", encoding="utf-8") as handle:
-            json.dump(metrics, handle, indent=2)
+            json.dump({**existing, "test_metrics": metrics}, handle, indent=2)
+        prediction_rows = []
+        for index, metadata in enumerate(example_metadata):
+            prediction_rows.append(
+                {
+                    "source_index": metadata.get("sample_id"),
+                    "modulation": metadata.get("class_name"),
+                    "source_snr_db": metadata.get("snr_db"),
+                    "true_label": int(truth[index]),
+                    "predicted_label": int(predicted[index]),
+                    "jam_probability": float(probabilities[index, 1]),
+                    "jammer_type": metadata.get("jammer_type"),
+                    "jsr_db": metadata.get("jsr_db_requested"),
+                }
+            )
+        pd.DataFrame(prediction_rows).to_csv(
+            checkpoint_path.parent / "balanced_test_predictions.csv", index=False
+        )
         display = ConfusionMatrixDisplay(np.asarray(metrics["confusion_matrix"]), display_labels=class_names)
         display.plot(xticks_rotation=45, colorbar=False)
         plt.tight_layout()
-        figure_path = checkpoint_path.parent / "confusion_matrix_source.png"
+        figure_path = checkpoint_path.parent / "confusion_matrix.png"
         plt.savefig(figure_path, dpi=160)
         plt.close()
         append_result(

@@ -36,7 +36,9 @@ try {
     Invoke-RepositoryCheck "RadioML preparation CLI" { python scripts/prepare_radioml.py --help }
     Invoke-RepositoryCheck "Capture preparation CLI" { python scripts/prepare_captures.py --help }
     Invoke-RepositoryCheck "Training CLI" { python scripts/train.py --help }
+    Invoke-RepositoryCheck "Baseline preflight CLI" { python scripts/preflight_baseline.py --help }
     Invoke-RepositoryCheck "Source evaluation CLI" { python scripts/evaluate.py --help }
+    Invoke-RepositoryCheck "Stress evaluation CLI" { python scripts/evaluate_stress.py --help }
     Invoke-RepositoryCheck "Shifted evaluation CLI" { python scripts/evaluate_shift.py --help }
     Invoke-RepositoryCheck "Domain analysis CLI" { python scripts/analyze_domain_shift.py --help }
     Invoke-RepositoryCheck "Small-subset downloader CLI" { python scripts/download_radioml_subset.py --help }

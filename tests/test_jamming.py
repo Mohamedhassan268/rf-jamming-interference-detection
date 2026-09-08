@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import Dataset
 
 from src.data.jamming import (
+    FullJammerStressDataset,
     PairedBinaryJammingDataset,
     complex_power,
     generate_jammer,
@@ -74,6 +75,24 @@ def test_paired_dataset_is_balanced_and_reproducible():
     torch.testing.assert_close(first[1][0], second[1][0])
     assert first[1][2]["jammer_type"] == second[1][2]["jammer_type"]
     assert first[1][2]["jsr_db_requested"] == second[1][2]["jsr_db_requested"]
+
+
+def test_paired_condition_assignment_is_balanced():
+    dataset = SourceDataset()
+    paired = PairedBinaryJammingDataset(dataset, list(range(len(dataset))), CONFIG)
+    counts = list(paired.condition_counts().values())
+    assert max(counts) - min(counts) <= 1
+
+
+def test_full_stress_dataset_emits_every_condition_per_source():
+    stress = FullJammerStressDataset(SourceDataset(), [0, 2], CONFIG)
+    assert len(stress) == 2 * 3 * 3
+    metadata = [stress[index][2] for index in range(9)]
+    conditions = {(item["jammer_type"], item["jsr_db_requested"]) for item in metadata}
+    assert conditions == {
+        (jammer, jsr) for jammer in CONFIG["jammer_types"] for jsr in CONFIG["jsr_db_values"]
+    }
+    torch.testing.assert_close(stress[0][0], FullJammerStressDataset(SourceDataset(), [0, 2], CONFIG)[0][0])
 
 
 def test_zero_power_source_is_rejected_for_jamming():

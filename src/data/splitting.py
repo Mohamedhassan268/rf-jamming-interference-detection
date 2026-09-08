@@ -15,6 +15,16 @@ class SplitIndices:
     test: np.ndarray
 
 
+def radioml_strata(dataset) -> np.ndarray:
+    """Return joint modulation/source-SNR strata aligned with a RadioML adapter."""
+    modulation_ids = dataset.selected_labels
+    if dataset.snrs is None:
+        return modulation_ids
+    selected_snrs = np.asarray(dataset.snrs[dataset.indices])
+    _, snr_ids = np.unique(selected_snrs, return_inverse=True)
+    return modulation_ids * (snr_ids.max() + 1) + snr_ids
+
+
 def make_splits(
     labels: np.ndarray,
     train_fraction: float = 0.70,
@@ -45,4 +55,3 @@ def make_splits(
         remainder, test_size=relative_test, random_state=seed, stratify=y[remainder]
     )
     return SplitIndices(train, validation, test)
-
