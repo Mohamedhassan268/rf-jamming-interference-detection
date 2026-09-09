@@ -1,0 +1,123 @@
+{
+  "seed": 42,
+  "stratification": "RadioML modulation class + source SNR",
+  "splits": {
+    "train": {
+      "source_windows": 6451,
+      "modulation_distribution": {
+        "128APSK": 269,
+        "128QAM": 269,
+        "16APSK": 270,
+        "16PSK": 268,
+        "16QAM": 268,
+        "256QAM": 269,
+        "32APSK": 269,
+        "32PSK": 269,
+        "32QAM": 269,
+        "4ASK": 269,
+        "64APSK": 270,
+        "64QAM": 270,
+        "8ASK": 270,
+        "8PSK": 268,
+        "AM-DSB-SC": 269,
+        "AM-DSB-WC": 267,
+        "AM-SSB-SC": 269,
+        "AM-SSB-WC": 266,
+        "BPSK": 269,
+        "FM": 268,
+        "GMSK": 269,
+        "OOK": 269,
+        "OQPSK": 269,
+        "QPSK": 269
+      },
+      "source_snr_distribution": {
+        "-20": 1077,
+        "-10": 1076,
+        "0": 1072,
+        "10": 1074,
+        "20": 1077,
+        "30": 1075
+      }
+    },
+    "validation": {
+      "source_windows": 1382,
+      "modulation_distribution": {
+        "128APSK": 57,
+        "128QAM": 57,
+        "16APSK": 56,
+        "16PSK": 57,
+        "16QAM": 58,
+        "256QAM": 60,
+        "32APSK": 60,
+        "32PSK": 57,
+        "32QAM": 58,
+        "4ASK": 57,
+        "64APSK": 59,
+        "64QAM": 56,
+        "8ASK": 57,
+        "8PSK": 57,
+        "AM-DSB-SC": 58,
+        "AM-DSB-WC": 57,
+        "AM-SSB-SC": 56,
+        "AM-SSB-WC": 58,
+        "BPSK": 58,
+        "FM": 59,
+        "GMSK": 58,
+        "OOK": 56,
+        "OQPSK": 58,
+        "QPSK": 58
+      },
+      "source_snr_distribution": {
+        "-20": 230,
+        "-10": 228,
+        "0": 232,
+        "10": 230,
+        "20": 228,
+        "30": 234
+      }
+    },
+    "test": {
+      "source_windows": 1383,
+      "modulation_distribution": {
+        "128APSK": 58,
+        "128QAM": 58,
+        "16APSK": 58,
+        "16PSK": 59,
+        "16QAM": 58,
+        "256QAM": 55,
+        "32APSK": 55,
+        "32PSK": 58,
+        "32QAM": 57,
+        "4ASK": 58,
+        "64APSK": 55,
+        "64QAM": 58,
+        "8ASK": 57,
+        "8PSK": 59,
+        "AM-DSB-SC": 57,
+        "AM-DSB-WC": 60,
+        "AM-SSB-SC": 59,
+        "AM-SSB-WC": 60,
+        "BPSK": 57,
+        "FM": 57,
+        "GMSK": 57,
+        "OOK": 59,
+        "OQPSK": 57,
+        "QPSK": 57
+      },
+      "source_snr_distribution": {
+        "-20": 229,
+        "-10": 232,
+        "0": 232,
+        "10": 232,
+        "20": 231,
+        "30": 227
+      }
+    }
+  },
+  "pairwise_source_position_overlap": {
+    "train_validation": 0,
+    "train_test": 0,
+    "validation_test": 0
+  },
+  "leakage_check_passed": true
+}

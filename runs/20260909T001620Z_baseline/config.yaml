@@ -1,0 +1,128 @@
+seed: 42
+deterministic: true
+provenance:
+  historical_fidelity: false
+  status: new_experiment_design
+dataset:
+  name: radioml2018
+  path: data/raw/
+  file: radioml2018.01a_small.hdf5
+  schema:
+    samples_key: X
+    labels_key: Y
+    snr_key: Z
+    class_names:
+    - 32PSK
+    - 16APSK
+    - 32QAM
+    - FM
+    - GMSK
+    - 32APSK
+    - OQPSK
+    - 8ASK
+    - BPSK
+    - 8PSK
+    - AM-SSB-SC
+    - 4ASK
+    - 16PSK
+    - 64APSK
+    - 128QAM
+    - 128APSK
+    - AM-DSB-SC
+    - AM-SSB-WC
+    - 64QAM
+    - QPSK
+    - 256QAM
+    - AM-DSB-WC
+    - OOK
+    - 16QAM
+  task_type: binary_synthetic_jamming_detection
+  classes: all
+  snr_min: -20
+  snr_max: 30
+  input_length: 1024
+  max_examples_per_class: null
+  sample_seed: 42
+  train_fraction: 0.7
+  validation_fraction: 0.15
+  test_fraction: 0.15
+  subset:
+    status: deterministic_range_extracted_subset
+    source_full_file_sha256: e3dd0bef66a3426959ee66a1709a8c0a95d4f8395d18aaf6f1214bdbc763bd38
+    local_file_sha256: 40f5245781f4f983ab5c46a382e6010453160bfc5523f16829998e8a7ff0b0eb
+    selected_snrs_db:
+    - -20
+    - -10
+    - 0
+    - 10
+    - 20
+    - 30
+    samples_per_modulation_snr: 64
+    source_windows: 9216
+preprocessing:
+  normalization: none
+  remove_dc: false
+  amplitude_scale:
+    enabled: false
+    min: 0.8
+    max: 1.2
+  phase_rotation:
+    enabled: false
+  awgn:
+    enabled: false
+    snr_db_min: null
+    snr_db_max: null
+  frequency_offset:
+    enabled: false
+    max_normalized_offset: null
+model:
+  name: provisional_compact_cnn
+  num_classes: 2
+  conv_channels:
+  - 64
+  - 128
+  - 256
+  kernel_sizes:
+  - 7
+  - 5
+  - 3
+  pooling:
+  - 2
+  - 2
+  - 2
+  dropout: 0.3
+  classifier_size: 384
+label_generation:
+  strategy: paired_clean_jammed
+  labels:
+    clean: 0
+    jammed: 1
+  jammer_types:
+  - tone
+  - chirp
+  - barrage
+  jsr_db_values:
+  - -10.0
+  - -5.0
+  - 0.0
+  - 5.0
+  - 10.0
+  seed: 42
+  tone:
+    normalized_frequency_min: -0.45
+    normalized_frequency_max: 0.45
+    excluded_dc_half_width: 0.02
+  chirp:
+    normalized_start_min: -0.4
+    normalized_start_max: 0.4
+    normalized_sweep_min: 0.05
+    normalized_sweep_max: 0.4
+training:
+  epochs: 50
+  batch_size: 128
+  num_workers: 0
+  optimizer: adam
+  learning_rate: 0.001
+  weight_decay: 0.0
+  early_stopping_patience: 8
+  device: auto

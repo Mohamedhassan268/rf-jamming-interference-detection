@@ -1,0 +1,351 @@
+{
+  "selection_metric": "validation_loss",
+  "best_epoch": 7,
+  "best_validation_loss": 0.2972457280811111,
+  "test_metrics": {
+    "accuracy": 0.8702096890817065,
+    "macro_precision": 0.8969575200918485,
+    "macro_recall": 0.8702096890817064,
+    "macro_f1": 0.8679858412962194,
+    "weighted_f1": 0.8679858412962194,
+    "confusion_matrix": [
+      [
+        1383,
+        0
+      ],
+      [
+        359,
+        1024
+      ]
+    ],
+    "per_class": {
+      "clean": {
+        "precision": 0.7939150401836969,
+        "recall": 1.0,
+        "f1": 0.88512,
+        "support": 1383
+      },
+      "jammed": {
+        "precision": 1.0,
+        "recall": 0.7404193781634129,
+        "f1": 0.8508516825924387,
+        "support": 1383
+      }
+    },
+    "ece": 0.07656287363270442,
+    "per_snr": {
+      "-20.0": {
+        "accuracy": 0.8275109170305677,
+        "macro_precision": 0.8717532467532467,
+        "macro_recall": 0.8275109170305677,
+        "macro_f1": 0.8222215670956108,
+        "weighted_f1": 0.8222215670956108,
+        "confusion_matrix": [
+          [
+            229,
+            0
+          ],
+          [
+            79,
+            150
+          ]
+        ],
+        "per_class": {
+          "0": {
+            "precision": 0.7435064935064936,
+            "recall": 1.0,
+            "f1": 0.8528864059590316,
+            "support": 229
+          },
+          "1": {
+            "precision": 1.0,
+            "recall": 0.6550218340611353,
+            "f1": 0.7915567282321899,
+            "support": 229
+          }
+        }
+      },
+      "-10.0": {
+        "accuracy": 0.8103448275862069,
+        "macro_precision": 0.8625,
+        "macro_recall": 0.8103448275862069,
+        "macro_f1": 0.8032685784767191,
+        "weighted_f1": 0.8032685784767192,
+        "confusion_matrix": [
+          [
+            232,
+            0
+          ],
+          [
+            88,
+            144
+          ]
+        ],
+        "per_class": {
+          "0": {
+            "precision": 0.725,
+            "recall": 1.0,
+            "f1": 0.8405797101449275,
+            "support": 232
+          },
+          "1": {
+            "precision": 1.0,
+            "recall": 0.6206896551724138,
+            "f1": 0.7659574468085106,
+            "support": 232
+          }
+        }
+      },
+      "0.0": {
+        "accuracy": 0.8814655172413793,
+        "macro_precision": 0.9041811846689896,
+        "macro_recall": 0.8814655172413793,
+        "macro_f1": 0.8797763236617343,
+        "weighted_f1": 0.8797763236617344,
+        "confusion_matrix": [
+          [
+            232,
+            0
+          ],
+          [
+            55,
+            177
+          ]
+        ],
+        "per_class": {
+          "0": {
+            "precision": 0.8083623693379791,
+            "recall": 1.0,
+            "f1": 0.8940269749518305,
+            "support": 232
+          },
+          "1": {
+            "precision": 1.0,
+            "recall": 0.7629310344827587,
+            "f1": 0.8655256723716381,
+            "support": 232
+          }
+        }
+      },
+      "10.0": {
+        "accuracy": 0.9116379310344828,
+        "macro_precision": 0.924908424908425,
+        "macro_recall": 0.9116379310344828,
+        "macro_f1": 0.9109425836200642,
+        "weighted_f1": 0.9109425836200641,
+        "confusion_matrix": [
+          [
+            232,
+            0
+          ],
+          [
+            41,
+            191
+          ]
+        ],
+        "per_class": {
+          "0": {
+            "precision": 0.8498168498168498,
+            "recall": 1.0,
+            "f1": 0.9188118811881189,
+            "support": 232
+          },
+          "1": {
+            "precision": 1.0,
+            "recall": 0.8232758620689655,
+            "f1": 0.9030732860520094,
+            "support": 232
+          }
+        }
+      },
+      "20.0": {
+        "accuracy": 0.9069264069264069,
+        "macro_precision": 0.9215328467153285,
+        "macro_recall": 0.9069264069264069,
+        "macro_f1": 0.9061130934095796,
+        "weighted_f1": 0.9061130934095797,
+        "confusion_matrix": [
+          [
+            231,
+            0
+          ],
+          [
+            43,
+            188
+          ]
+        ],
+        "per_class": {
+          "0": {
+            "precision": 0.843065693430657,
+            "recall": 1.0,
+            "f1": 0.9148514851485149,
+            "support": 231
+          },
+          "1": {
+            "precision": 1.0,
+            "recall": 0.8138528138528138,
+            "f1": 0.8973747016706444,
+            "support": 231
+          }
+        }
+      },
+      "30.0": {
+        "accuracy": 0.8832599118942731,
+        "macro_precision": 0.9053571428571429,
+        "macro_recall": 0.8832599118942731,
+        "macro_f1": 0.881646967394138,
+        "weighted_f1": 0.881646967394138,
+        "confusion_matrix": [
+          [
+            227,
+            0
+          ],
+          [
+            53,
+            174
+          ]
+        ],
+        "per_class": {
+          "0": {
+            "precision": 0.8107142857142857,
+            "recall": 1.0,
+            "f1": 0.8954635108481263,
+            "support": 227
+          },
+          "1": {
+            "precision": 1.0,
+            "recall": 0.7665198237885462,
+            "f1": 0.8678304239401496,
+            "support": 227
+          }
+        }
+      }
+    },
+    "jamming": {
+      "clean_false_positive_rate": {
+        "rate": 0.0,
+        "support": 1383
+      },
+      "jammed_detection_rate": {
+        "rate": 0.7404193781634129,
+        "support": 1383
+      },
+      "detection_rate_by_jammer": {
+        "barrage": {
+          "rate": 0.7304347826086957,
+          "support": 460
+        },
+        "chirp": {
+          "rate": 0.7434782608695653,
+          "support": 460
+        },
+        "tone": {
+          "rate": 0.7473002159827213,
+          "support": 463
+        }
+      },
+      "detection_rate_by_jsr_db": {
+        "-10": {
+          "rate": 0.07220216606498195,
+          "support": 277
+        },
+        "-5": {
+          "rate": 0.631768953068592,
+          "support": 277
+        },
+        "0": {
+          "rate": 1.0,
+          "support": 277
+        },
+        "5": {
+          "rate": 1.0,
+          "support": 276
+        },
+        "10": {
+          "rate": 1.0,
+          "support": 276
+        }
+      },
+      "detection_rate_by_jammer_and_jsr_db": {
+        "barrage": {
+          "-10": {
+            "rate": 0.06521739130434782,
+            "support": 92
+          },
+          "-5": {
+            "rate": 0.5869565217391305,
+            "support": 92
+          },
+          "0": {
+            "rate": 1.0,
+            "support": 92
+          },
+          "5": {
+            "rate": 1.0,
+            "support": 92
+          },
+          "10": {
+            "rate": 1.0,
+            "support": 92
+          }
+        },
+        "chirp": {
+          "-10": {
+            "rate": 0.08695652173913043,
+            "support": 92
+          },
+          "-5": {
+            "rate": 0.6304347826086957,
+            "support": 92
+          },
+          "0": {
+            "rate": 1.0,
+            "support": 92
+          },
+          "5": {
+            "rate": 1.0,
+            "support": 92
+          },
+          "10": {
+            "rate": 1.0,
+            "support": 92
+          }
+        },
+        "tone": {
+          "-10": {
+            "rate": 0.06451612903225806,
+            "support": 93
+          },
+          "-5": {
+            "rate": 0.6774193548387096,
+            "support": 93
+          },
+          "0": {
+            "rate": 1.0,
+            "support": 93
+          },
+          "5": {
+            "rate": 1.0,
+            "support": 92
+          },
+          "10": {
+            "rate": 1.0,
+            "support": 92
+          }
+        }
+      }
+    },
+    "jammed_precision": 1.0,
+    "jammed_recall_detection_rate": 0.7404193781634129,
+    "jammed_f1": 0.8508516825924387,
+    "specificity": 1.0,
+    "clean_false_positive_rate": 0.0
+  },
+  "stress_test_metrics": {
+    "test_source_windows": 1383,
+    "jammed_variants": 20745,
+    "overall_detection_rate": 0.7344902386117137,
+    "overall_mean_jam_probability": 0.7504009693847988,
+    "condition_grid_size": 15
+  }
+}

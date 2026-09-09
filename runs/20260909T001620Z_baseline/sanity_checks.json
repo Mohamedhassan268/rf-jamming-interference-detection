@@ -1,0 +1,69 @@
+{
+  "train": {
+    "generated_examples": 12902,
+    "clean_examples": 6451,
+    "jammed_examples": 6451,
+    "clean_fraction": 0.5,
+    "jammed_fraction": 0.5,
+    "jammer_jsr_counts": {
+      "tone|-10": 431,
+      "tone|-5": 430,
+      "tone|0": 430,
+      "tone|5": 430,
+      "tone|10": 430,
+      "chirp|-10": 430,
+      "chirp|-5": 430,
+      "chirp|0": 430,
+      "chirp|5": 430,
+      "chirp|10": 430,
+      "barrage|-10": 430,
+      "barrage|-5": 430,
+      "barrage|0": 430,
+      "barrage|5": 430,
+      "barrage|10": 430
+    },
+    "condition_count_range": [
+      430,
+      431
+    ],
+    "condition_balance_passed": true
+  },
+  "validation": {
+    "generated_examples": 2764,
+    "clean_examples": 1382,
+    "jammed_examples": 1382,
+    "clean_fraction": 0.5,
+    "jammed_fraction": 0.5,
+    "jammer_jsr_counts": {
+      "tone|-10": 93,
+      "tone|-5": 93,
+      "tone|0": 92,
+      "tone|5": 92,
+      "tone|10": 92,
+      "chirp|-10": 92,
+      "chirp|-5": 92,
+      "chirp|0": 92,
+      "chirp|5": 92,
+      "chirp|10": 92,
+      "barrage|-10": 92,
+      "barrage|-5": 92,
+      "barrage|0": 92,
+      "barrage|5": 92,
+      "barrage|10": 92
+    },
+    "condition_count_range": [
+      92,
+      93
+    ],
+    "condition_balance_passed": true
+  },
+  "determinism": {
+    "sample_generated_twice_identically": true
+  },
+  "jsr_check": {
+    "samples_checked": 30,
+    "tolerance_db": 0.0001,
+    "maximum_absolute_error_db": 4.426852136732087e-07,
+    "passed": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp_utc": "2026-09-09T00:16:21.666733+00:00",
+  "git_commit": "0c984613637760f82d21fb6cf8d13bdeaaafcce0",
+  "seed": 42,
+  "model": "ProvisionalCompactRFNet",
+  "parameter_count": 240962,
+  "class_names": [
+    "clean",
+    "jammed"
+  ],
+  "dataset_selected_source_windows": 9216,
+  "dataset_subset_sha256": "40f5245781f4f983ab5c46a382e6010453160bfc5523f16829998e8a7ff0b0eb",
+  "generated_training_examples": 12902,
+  "generated_validation_examples": 2764,
+  "split_source_window_counts": {
+    "train": 6451,
+    "validation": 1382,
+    "test": 1383
+  },
+  "split_seed": 42,
+  "best_epoch": 7,
+  "deterministic_algorithms": true
+}
